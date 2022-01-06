@@ -1,28 +1,7 @@
 from grid import Grid
-
-# load test data
-
-g = Grid(20,31)
-
-g.add_xcol(20)
-for i in range(21, 30):
-    g.add_x(i)
-g.add_ocol(28)
-for j in range(27, 24, -1):
-    g.add_o(j)
-g.add_xcol(26)
-for i in range(27, 31):
-    g.add_x(i)
-g.add_ocol(29)
-for j in range(28, 24, -1):
-    g.add_o(j)
-g.add_o(24)
-g.add_xcol(25)
-for i in range(26, 28):
-    g.add_x(i)
-g.add_ocol(26)
-g.add_o(25)
-g.add_o(24)
+import pandas_datareader.data as web
+import pandas as pd
+import datetime as dt
 
 
 # get new price
@@ -39,7 +18,6 @@ def get_low_price(daily_low):
         low_price = g.x_vals[::-1][i]
         i += 1
     return low_price
-
 
 # update graph
 def action(daily_high, daily_low):
@@ -92,4 +70,16 @@ def action(daily_high, daily_low):
     else:
         g.add_xcol(get_high_price(daily_high))
 
-    g.printgrid()
+
+# get real data
+df = web.DataReader('ARES', 'yahoo', start='2021-01-01', end='2022-01-03')[['High', 'Low']]
+high = df.High
+low = df.Low
+
+# chart data
+g = Grid(int(min(low)), int(max(high)) + 2)
+
+for i in range(len(high)):
+    action(high[i], low[i])
+
+g.printgrid()
